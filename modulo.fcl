@@ -1,0 +1,6 @@
+Mod(n, m):
+init: if n < m goto returnFalse else goto subtract;
+subtract: n := n - m;
+          if n = 0 goto returnTrue else goto init;
+returnTrue: return 0;
+returnFalse: return 1;

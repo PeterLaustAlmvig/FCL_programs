@@ -1,0 +1,41 @@
+fizzbuzz(n):
+init:   list := '();
+        i := 1;
+        goto loop;
+
+loop:   if i != n goto checkfizz else goto end;
+
+checkfizz:
+        tmp := i;
+        d := 3;
+        goto mod3;
+mod3:   if tmp < d goto mod3false else goto mod3sub;
+mod3sub: tmp := tmp - d;
+         if tmp = 0 goto mod3true else goto mod3;
+mod3true:  r3 := 0; goto checkbuzz;
+mod3false: r3 := 1; goto checkbuzz;
+
+checkbuzz:
+        tmp := i;
+        d := 5;
+        goto mod5;
+mod5:   if tmp < d goto mod5false else goto mod5sub;
+mod5sub: tmp := tmp - d;
+         if tmp = 0 goto mod5true else goto mod5;
+mod5true:  r5 := 0; goto decide;
+mod5false: r5 := 1; goto decide;
+
+decide: if r3 = 0 goto fizzoption else goto buzzoption;
+
+fizzoption: if r5 = 0 goto addfb else goto addfizz;
+buzzoption: if r5 = 0 goto addbuzz else goto addnum;
+
+addfizz: list := cons(list, 'fizz);    goto loopupdate;
+addbuzz: list := cons(list, 'buzz);    goto loopupdate;
+addfb:   list := cons(list, 'fizzbuzz); goto loopupdate;
+addnum:  list := cons(list, i);       goto loopupdate;
+
+loopupdate: i := i + 1;
+            goto loop;
+
+end: return list;
