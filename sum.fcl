@@ -1,0 +1,12 @@
+Sum(list):
+init: sum := 0;
+	  goto loop;
+
+loop: if list = '() goto end else cont;
+
+cont: term := hd(hd(list));
+	  list := tl(list);
+	  sum := sum + term;
+	  goto loop;
+
+end : return sum
