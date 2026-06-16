@@ -1,0 +1,2 @@
+head(list):
+init: return hd(list);

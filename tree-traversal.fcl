@@ -1,0 +1,48 @@
+Traversal(exp):
+init:
+  result := '();
+  stack  := cons(exp, '());
+  goto loop;
+
+loop:
+  if stack = '() goto reverse else goto process;
+
+process:
+  node  := hd(stack);
+  stack := tl(stack);
+  if hd(node) = 'emit goto emit else goto check_int;
+
+check_int:
+  if hd(node) = 'int goto emit_int else goto expand;
+
+emit:
+  result := cons(hd(tl(node)), result);
+  goto loop;
+
+emit_int:
+  result := cons(hd(tl(node)), result);
+  goto loop;
+
+expand:
+  op    := hd(node);
+  left  := hd(tl(node));
+  right := hd(tl(tl(node)));
+  stack := cons(right, stack);
+  stack := cons(cons('emit, cons(op, '())), stack);
+  stack := cons(left, stack);
+  goto loop;
+
+reverse:
+  rev := '();
+  goto rev_loop;
+
+rev_loop:
+  if result = '() goto done else goto rev_step;
+
+rev_step:
+  rev    := cons(hd(result), rev);
+  result := tl(result);
+  goto rev_loop;
+
+done:
+  return rev;

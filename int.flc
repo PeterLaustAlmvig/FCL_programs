@@ -1,0 +1,32 @@
+Interpreter(prog, input_vars):
+init:
+  store := '();
+  entry := hd(prog);
+  next_block := entry;
+  vars := hd(tl(prog));
+  blocks := tl(tl(prog));
+  goto set_vars_loop;
+
+set_vars_loop:
+  if input_vars = '() goto eval_prog else goto set_var;
+
+set_var:
+  var := hd(vars);
+  vars := tl(vars);
+  input := hd(input_vars);
+  input_vars := tl(input_vars);
+  store := cons(list(var, input), store);
+  if vars = '() goto check_input_empty else goto check_input_nonempty;
+
+check_input_empty:
+  if input_vars = '() goto eval_prog else goto error_input_size;
+
+check_input_nonempty:
+  if input_vars = '() goto error_input_size else set_var;
+
+error_input_size:
+  return 'error_non_matching_size_of_input_and_vars;
+
+eval_prog:
+  
+
