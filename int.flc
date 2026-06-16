@@ -24,9 +24,30 @@ check_input_empty:
 check_input_nonempty:
   if input_vars = '() goto error_input_size else set_var;
 
+eval_prog:
+  blocks_lookup := hd(blocks);
+  goto eval_prog_loop;
+
+eval_prog_loop:
+  curr_block := hd(blocks_lookup);
+  blocks_lookup := tl(blocks_lookup);
+  block_lbl := hd(curr_block);
+  if next_block = block_lbl goto eval_block else goto eval_prog_loop_check;
+
+eval_prog_loop_check:
+  if blocks_lookup = '() goto error_block_lbl_missing else goto eval_prog_loop;
+
+eval_block:
+  assignments := hd(tl(curr_block));
+  jump := tl(tl(curr_block));
+  goto eval_assignments;
+
+eval_assignments:
+  
+
 error_input_size:
   return 'error_non_matching_size_of_input_and_vars;
 
-eval_prog:
-  
+error_block_lbl_missing:
+  return list('error_block_not_found, next_block);
 
