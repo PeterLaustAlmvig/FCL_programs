@@ -75,39 +75,37 @@ sete1:
 
 lookupe0:
   lookup_var := hd(tl(e0));
-  store_lookup := store;
-  goto lookup_e0_loop;
-
-lookup_e0_loop:
-  curr_var := hd(store_lookup);
-  store_lookup := tl(store_lookup);
-  var_lbl := hd(curr_var);
-  var_val := hd(tl(curr_var));
-  if lookup_var =  var_lbl goto found_var_e0 else goto lookup_e0_loop_check;
-
-lookup_e0_loop_check:
-  if store_lookup = '() goto error_var_not_found else goto lookup_e0_loop;
-
-found_var_e0:
-  e0 := var_val;
-  goto check_e1_lbl;
+  return_point := 'lookupe0_found;
+  goto lookup;
 
 lookupe1:
   lookup_var := hd(tl(e1));
-  store_lookup := store;
-  goto lookup_e1_loop;
+  return_point := 'lookupe1_found;
+  goto lookup;
 
-lookup_e1_loop:
+lookup:
+  store_lookup := store;
+  goto lookup_loop;
+
+lookup_loop:
   curr_var := hd(store_lookup);
   store_lookup := tl(store_lookup);
   var_lbl := hd(curr_var);
   var_val := hd(tl(curr_var));
-  if lookup_var =  var_lbl goto found_var_e1 else goto lookup_e1_loop_check;
+  if lookup_var =  var_lbl goto found_var else goto lookup_loop_check;
 
-lookup_e1_loop_check:
-  if store_lookup = '() goto error_var_not_found else goto lookup_e1_loop;
+lookup_loop_check:
+  if store_lookup = '() goto error_var_not_found else goto lookup_loop;
 
-found_var_e1:
+found_var:
+  comment := 'val_stored_in_var_val;
+  goto find_return;
+
+lookupe0_found:
+  e0 := var_val;
+  goto check_e1_lbl;
+
+lookupe1_found:
   e1 := var_val;
   goto check_op;
 
@@ -178,6 +176,9 @@ do_if:
   ret := tl(jump);
   return ret;
 
+find_return: if return_point = 'lookupe0_found goto lookupe0_found else goto fr0;
+fr0: if return_point = 'lookupe1_found goto lookupe1_found else goto error_return_point_missing;
+
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
 
@@ -192,3 +193,6 @@ error_op:
 
 error_var_not_found:
   return list('error_var_not_found_in_store, lookup_var);
+
+error_return_point_missing:
+  return list('error_return_point_not_found, return_point);

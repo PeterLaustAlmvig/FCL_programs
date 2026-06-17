@@ -1,0 +1,6 @@
+CheckGotoAtom():
+init:
+  l := 'label;
+  goto l;
+
+label: return 'worked;
