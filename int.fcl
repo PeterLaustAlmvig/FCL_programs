@@ -1,6 +1,7 @@
 Interpreter(prog, input_vars):
 init:
   store := '();
+  return_point := 'none;
   entry := hd(prog);
   next_block := entry;
   vars := hd(tl(prog));
@@ -44,14 +45,23 @@ eval_block:
 
 eval_assignments:
   assignment_list := assignments;
-  goto eval_assignments_loop;
+  goto eval_assignments_loop_check;
 
 eval_assignments_loop:
   curr_assign := hd(assignment_list);
   assignment_list := tl(assignment_list);
   assgn_var := hd(curr_assign);
   expr := hd(tl(curr_assign));
+  return_point := 'eval_assignments_loop_store;
   goto eval_expr;
+
+eval_assignments_loop_store:
+  return_point = 'none;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+
+eval_assignments_loop_check:
+  if assignment_list = '() goto eval_jump else goto eval_assignments_loop;
 
 eval_expr:
   op := hd(expr);
@@ -102,10 +112,12 @@ found_var:
   goto find_return;
 
 lookupe0_found:
+  return_point := 'none;
   e0 := var_val;
   goto check_e1_lbl;
 
 lookupe1_found:
+  return_point := 'none;
   e1 := var_val;
   goto check_op;
 
@@ -123,41 +135,31 @@ opcont9: if op = 'cons do_cons else goto error_op;
 
 do_pls:
   ex := e0 + e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_min:
   ex := e0 - e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_mul:
   ex := e0 * e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_eql:
   ex := e0 = e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_lt:
   ex := e0 < e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_gt:
   ex := e0 > e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_nul:
   ex := e0;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
+  goto find_return;
 do_hd:
   return 'unimplemented;
 do_tl:
   return 'unimplemented;
 do_cons:
   return 'unimplemented;
-
-eval_assignments_loop_check:
-  if assignment_list = '() goto eval_jump else goto eval_assignments_loop;
 
 eval_jump:
   jump_type := hd(jump);
@@ -169,15 +171,54 @@ do_goto:
   next_block := hd(tl(jump));
   goto eval_prog;
 
+do_if:
+  expr := hd(tl(jump));
+  thenbr := hd(tl(tl(jump)));
+  elsebr := hd(tl(tl(tl(jump))));
+  return_point := 'do_if_check;
+  goto eval_expr;
+
+do_if_check:
+  return_point := 'none;
+  if ex = true goto do_if_then else goto do_if_else;
+
+do_if_then:
+  next_block := thenbr;
+  goto eval_prog;
+
+do_if_else:
+  next_block := elsebr;
+  goto eval_prog;
+
 do_return:
+  ret := hd(tl(jump));
+  type := hd(ret);
+  if type = 'i goto ret_int else dr0;
+dr0: if type = 'a goto ret_var else goto dr1;
+dr1: if type = 'store goto ret_store else goto error_return_type;
+
+ret_int:
+  int := hd(tl(ret));
+  return int;
+
+ret_var:
+  lookup_var := hd(tl(ret));
+  return_point := 'ret_var_found;
+  goto lookup;
+
+ret_var_found:
+  return_point = 'none;
+  return var_val;
+
+ret_store:
   return store;
 
-do_if:
-  ret := tl(jump);
-  return ret;
-
 find_return: if return_point = 'lookupe0_found goto lookupe0_found else goto fr0;
-fr0: if return_point = 'lookupe1_found goto lookupe1_found else goto error_return_point_missing;
+fr0: if return_point = 'lookupe1_found goto lookupe1_found else goto fr1;
+fr1: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr2;
+fr2: if return_point = 'ret_var_found goto ret_var_found else goto fr3;
+fr3: if return_point = 'do_if_check goto do_if_check else goto fr4;
+fr4: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
 
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
@@ -196,3 +237,9 @@ error_var_not_found:
 
 error_return_point_missing:
   return list('error_return_point_not_found, return_point);
+
+error_return_point_not_specified
+  return 'error_return_point_not_specified;
+
+error_return_type:
+  return list('error_return_type_not_known_not_return_of_expr_not_possible, type);

@@ -1,2 +1,8 @@
 Return():
-init: return 1+1;
+init:
+  l := 'label;
+  if l = 1 goto return1 else goto return1;
+
+return1: return 'return1;
+
+return2: return 'return2;

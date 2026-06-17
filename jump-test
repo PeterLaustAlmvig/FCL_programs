@@ -6,6 +6,6 @@
      '('goto 'lbl2)) \
     '('lbl2 \
      '('('v2 '('mul '('i 3) '('i 2)))) \
-     '('return 'store)) \
+     '('return '('i 2))) \
  ))" \
  "'()"

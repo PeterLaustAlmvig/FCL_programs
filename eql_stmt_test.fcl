@@ -1,0 +1,4 @@
+Equal():
+init:
+  n := 1 = 1;
+  return n;
