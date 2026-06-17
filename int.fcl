@@ -155,11 +155,14 @@ do_nul:
   ex := e0;
   goto find_return;
 do_hd:
-  return 'unimplemented;
+  ex := hd(e0);
+  goto find_return;
 do_tl:
-  return 'unimplemented;
+  ex := tl(e0);
+  goto find_return;
 do_cons:
-  return 'unimplemented;
+  ex := cons(e0, e1);
+  goto find_return;
 
 eval_jump:
   jump_type := hd(jump);

@@ -1,0 +1,2 @@
+Conversion():
+init: return true+1;
