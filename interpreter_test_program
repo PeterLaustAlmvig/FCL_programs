@@ -1,4 +1,14 @@
-"'('lbl3 \
- '('var1 'var2 'var3) \
- '('('lbl1 '() '()) '('lbl2 '() '())))" \
-"'(1 2 3)"
+"'('lbl1 \
+ '() \
+ '('('lbl1 '(\
+ '('plus '(1 'pls 2)) \
+ '('minus '(1 'min 4))\
+ '('multiply '(3 'mul 2))\
+ '('equalT '(2 'eql 2)) \
+ '('equalF '(1 'eql 2)) \
+ '('less-than '(1 'lt 2)) \
+ '('greater-than '(1 'gt 2)) \
+ '('nul '(10 'nul '())) \
+ ) '()) )
+ \)" \
+"'()"
