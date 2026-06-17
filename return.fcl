@@ -1,0 +1,2 @@
+Return():
+init: return 1+1;
