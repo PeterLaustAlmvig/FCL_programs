@@ -1,6 +1,7 @@
 Interpreter(prog, input_vars):
 init:
   store := '();
+  eval_stack := '();
   entry := hd(prog);
   next_block := entry;
   vars := hd(tl(prog));
@@ -51,14 +52,67 @@ eval_assignments_loop:
   assignment_list := tl(assignment_list);
   assgn_var := hd(curr_assign);
   expr := hd(tl(curr_assign));
-  goto eval_expr;
+  e := call eval_expr;
+  goto eval_assignments_loop_check;
 
 eval_expr:
   op := hd(expr);
-  e0  := hd(tl(expr));
-  e1 := hd(tl(tl(expr)));
-  goto check_e0_lbl;
+  if op = 'pls do_pls else goto opcont1;
+opcont1: if op = 'min do_min else goto opcont2;
+opcont2: if op = 'mul do_mul else goto opcont3;
+opcont3: if op = 'eql do_eql else goto opcont4;
+opcont4: if op = 'lt do_lt else goto opcont5;
+opcont5: if op = 'gt do_gt else goto opcont6;
+opcont6: if op = 'nul do_nul else goto opcont7;
+opcont7: if op = 'hd do_hd else goto opcont8;
+opcont8: if op = 'tl do_tl else goto opcont9;
+opcont9: if op = 'cons do_cons else goto opcont10;
+opcont10: if op = 'i do_int else goto opcont11;
+opcont11: if op = 'a do_lookup else goto error_op;
 
+
+do_int:
+  ex := tl(expr);
+  return ex;
+do_pls:
+  expr := hd(tl(expr));
+  e0 := call eval_expr;
+  return expr;
+  expr := hd(tl(tl(expr)));
+  e1 := call eval_expr;
+  ex := e0 + e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_min:
+  ex := e0 - e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_mul:
+  ex := e0 * e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_eql:
+  ex := e0 = e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_lt:
+  ex := e0 < e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_gt:
+  ex := e0 > e1;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_nul:
+  ex := e0;
+  store := cons(list(assgn_var, ex), store);
+  goto eval_assignments_loop_check;
+do_hd:
+  return 'unimplemented;
+do_tl:
+  return 'unimplemented;
+do_cons:
+  return 'unimplemented;
 
 check_e0_lbl:
   if hd(e0) = 'a goto lookupe0 else goto sete0;
@@ -109,53 +163,6 @@ lookupe0_found:
 lookupe1_found:
   e1 := var_val;
   goto check_op;
-
-check_op:
-  if op = 'pls do_pls else goto opcont1;
-opcont1: if op = 'min do_min else goto opcont2;
-opcont2: if op = 'mul do_mul else goto opcont3;
-opcont3: if op = 'eql do_eql else goto opcont4;
-opcont4: if op = 'lt do_lt else goto opcont5;
-opcont5: if op = 'gt do_gt else goto opcont6;
-opcont6: if op = 'nul do_nul else goto opcont7;
-opcont7: if op = 'hd do_hd else goto opcont8;
-opcont8: if op = 'tl do_tl else goto opcont9;
-opcont9: if op = 'cons do_cons else goto error_op;
-
-do_pls:
-  ex := e0 + e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_min:
-  ex := e0 - e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_mul:
-  ex := e0 * e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_eql:
-  ex := e0 = e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_lt:
-  ex := e0 < e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_gt:
-  ex := e0 > e1;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_nul:
-  ex := e0;
-  store := cons(list(assgn_var, ex), store);
-  goto eval_assignments_loop_check;
-do_hd:
-  return 'unimplemented;
-do_tl:
-  return 'unimplemented;
-do_cons:
-  return 'unimplemented;
 
 eval_assignments_loop_check:
   if assignment_list = '() goto eval_jump else goto eval_assignments_loop;

@@ -1,0 +1,7 @@
+Scoping():
+init:
+  x := 0;
+  call inc;
+
+inc:
+  x := x+1
