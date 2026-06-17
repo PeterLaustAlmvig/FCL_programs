@@ -54,9 +54,9 @@ eval_assignments_loop:
   goto eval_expr;
 
 eval_expr:
-  e0 := hd(expr);
+  op := hd(expr);
+  e0  := hd(tl(expr));
   e1 := hd(tl(tl(expr)));
-  op  := hd(tl(expr));
   goto check_e0_lbl;
 
 check_e0_lbl:

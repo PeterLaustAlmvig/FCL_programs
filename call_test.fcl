@@ -1,0 +1,20 @@
+Call():
+init:
+  ret_store := '();
+
+  comment := 'works;
+  n0 := call ret1;
+  n1 := call ret2;
+  n := n0 + n1;
+  ret_store := cons(n, ret_store);
+
+  comment := 'doesnt_work;
+  c := call ret1 + call ret2;
+  ret_store := cons(c, ret_store);
+  return ret_store;
+
+ret1:
+  return 1;
+
+ret2:
+  return 2;

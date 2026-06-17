@@ -1,0 +1,17 @@
+"'('lbl1 \
+ '() \
+ '( \
+ 	'('lbl1 '(\
+ 		'('plus '('pls '('i 1) '('i 2))) \
+ 		'('minus '('min '('i 5) '('i 4)))\
+ 		'('multiply '('mul '('i 3) '('i 2)))\
+		'('equalT '('eql '('i 2) '('i 2))) \
+		'('equalF '('eql '('i 1) '('i 2))) \
+		'('less-than '('lt '('i 1) '('i 2))) \
+		'('greater-than '('gt '('i 1) '('i 2))) \
+		'('nul '('nul '('i 10) '('n '()))) \
+ 		) \
+ 		'('return 'return)) )
+ \)" \
+"'()"
+
