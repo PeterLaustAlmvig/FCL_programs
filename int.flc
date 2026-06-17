@@ -54,45 +54,109 @@ eval_assignments_loop:
   goto eval_expr;
 
 eval_expr:
-  lhs := hd(expr);
-  rhs := hd(tl(tl(expr)));
+  e0 := hd(expr);
+  e1 := hd(tl(tl(expr)));
   op  := hd(tl(expr));
+  goto check_e0_lbl;
+
+check_e0_lbl:
+  if hd(e0) = 'a goto lookupe0 else goto sete0;
+
+sete0:
+  e0 := hd(tl(e0));
+  goto check_e1_lbl;
+
+check_e1_lbl:
+  if hd(e1) = 'a goto lookupe1 else goto sete1;
+  
+sete1:
+  e1 := hd(tl(e1));
+  goto check_op;
+
+lookupe0:
+  lookup_var := hd(tl(e0));
+  store_lookup := store;
+  goto lookup_e0_loop;
+
+lookup_e0_loop:
+  curr_var := hd(store_lookup);
+  store_lookup := tl(store_lookup);
+  var_lbl := hd(curr_var);
+  var_val := hd(tl(curr_var));
+  if lookup_var =  var_lbl goto found_var_e0 else goto lookup_e0_loop_check;
+
+lookup_e0_loop_check:
+  if store_lookup = '() goto error_var_not_found else goto lookup_e0_loop;
+
+found_var_e0:
+  e0 := var_val;
+  goto check_e1_lbl;
+
+lookupe1:
+  lookup_var := hd(tl(e1));
+  store_lookup := store;
+  goto lookup_e1_loop;
+
+lookup_e1_loop:
+  curr_var := hd(store_lookup);
+  store_lookup := tl(store_lookup);
+  var_lbl := hd(curr_var);
+  var_val := hd(tl(curr_var));
+  if lookup_var =  var_lbl goto found_var_e1 else goto lookup_e1_loop_check;
+
+lookup_e1_loop_check:
+  if store_lookup = '() goto error_var_not_found else goto lookup_e1_loop;
+
+found_var_e1:
+  e1 := var_val;
+  goto check_op;
+
+check_op:
   if op = 'pls do_pls else goto opcont1;
 opcont1: if op = 'min do_min else goto opcont2;
 opcont2: if op = 'mul do_mul else goto opcont3;
 opcont3: if op = 'eql do_eql else goto opcont4;
 opcont4: if op = 'lt do_lt else goto opcont5;
 opcont5: if op = 'gt do_gt else goto opcont6;
-opcont6: if op = 'nul do_nul else goto error_op;
+opcont6: if op = 'nul do_nul else goto opcont7;
+opcont7: if op = 'hd do_hd else goto opcont8;
+opcont8: if op = 'tl do_tl else goto opcont9;
+opcont9: if op = 'cons do_cons else goto error_op;
 
 do_pls:
-  ex := lhs + rhs;
+  ex := e0 + e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_min:
-  ex := lhs - rhs;
+  ex := e0 - e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_mul:
-  ex := lhs * rhs;
+  ex := e0 * e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_eql:
-  ex := lhs = rhs;
+  ex := e0 = e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_lt:
-  ex := lhs < rhs;
+  ex := e0 < e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_gt:
-  ex := lhs > rhs;
+  ex := e0 > e1;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
 do_nul:
-  ex := lhs;
+  ex := e0;
   store := cons(list(assgn_var, ex), store);
   goto eval_assignments_loop_check;
+do_hd:
+  return 'unimplemented;
+do_tl:
+  return 'unimplemented;
+do_cons:
+  return 'unimplemented;
 
 eval_assignments_loop_check:
   if assignment_list = '() goto eval_jump else goto eval_assignments_loop;
@@ -103,14 +167,12 @@ eval_jump:
 jcont1: if jump_type = 'return do_return else goto jcont2;
 jcont2: if jump_type = 'if do_if else goto error_jump_type_not_supported;
 
-
 do_goto:
-  next_block := tl(jump);
+  next_block := hd(tl(jump));
   goto eval_prog;
 
 do_return:
-  ret := tl(jump);
-  return ret;
+  return store;
 
 do_if:
   ret := tl(jump);
@@ -127,3 +189,6 @@ error_block_lbl_missing:
 
 error_op:
   return list('error_op_not_found, op);
+
+error_var_not_found:
+  return list('error_var_not_found_in_store, lookup_var);

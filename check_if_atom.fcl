@@ -1,0 +1,11 @@
+CheckIfAtom(v):
+init:
+  a := hd(v);
+  goto check;
+
+check:
+  if a = 'ab goto isAtom else isInt;
+
+isAtom: return 'atom;
+
+isInt: return 'int;

@@ -4,9 +4,9 @@ init: sum := 0;
 
 loop: if list = '() goto end else cont;
 
-cont: term := hd(hd(list));
+cont: term := hd(list);
 	  list := tl(list);
 	  sum := sum + term;
 	  goto loop;
 
-end : return sum
+end : return sum;

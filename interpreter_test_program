@@ -1,14 +1,17 @@
 "'('lbl1 \
  '() \
- '('('lbl1 '(\
- '('plus '(1 'pls 2)) \
- '('minus '(1 'min 4))\
- '('multiply '(3 'mul 2))\
- '('equalT '(2 'eql 2)) \
- '('equalF '(1 'eql 2)) \
- '('less-than '(1 'lt 2)) \
- '('greater-than '(1 'gt 2)) \
- '('nul '(10 'nul '())) \
- ) '()) )
+ '( \
+ 	'('lbl1 '(\
+ 		'('plus '('('i 1) 'pls '('i 2))) \
+ 		'('minus '('('i 5) 'min '('i 4)))\
+ 		'('multiply '(('i 3) 'mul ('i 2)))\
+		'('equalT '(('i 2) 'eql ('i 2))) \
+		'('equalF '(('i 1) 'eql ('i 2))) \
+		'('less-than '(('i 1) 'lt ('i 2))) \
+		'('greater-than '(('i 1) 'gt ('i 2))) \
+		'('nul '(('i 10) 'nul '('n '()))) \
+ 		) \
+ 		'('return 'return)) )
  \)" \
 "'()"
+

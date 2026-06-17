@@ -4,9 +4,9 @@ init: greatest := -1;
 
 loop: if list = '() goto end else cont;
 
-cont: term := hd(hd(list));
+cont: term := hd(list);
       list := tl(list);
-      if (greatest <= term) goto update else loop;
+      if (greatest < term) goto update else loop;
 
 update: greatest := term;
         goto loop;
