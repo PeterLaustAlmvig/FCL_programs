@@ -85,12 +85,12 @@ sete1:
 
 lookupe0:
   lookup_var := hd(tl(e0));
-  return_point := 'lookupe0_found;
+  return_point_lkup := 'lookupe0_found;
   goto lookup;
 
 lookupe1:
   lookup_var := hd(tl(e1));
-  return_point := 'lookupe1_found;
+  return_point_lkup := 'lookupe1_found;
   goto lookup;
 
 lookup:
@@ -109,15 +109,15 @@ lookup_loop_check:
 
 found_var:
   comment := 'val_stored_in_var_val;
-  goto find_return;
+  goto find_return_lkup;
 
 lookupe0_found:
-  return_point := 'none;
+  return_point_lkup := 'none;
   e0 := var_val;
   goto check_e1_lbl;
 
 lookupe1_found:
-  return_point := 'none;
+  return_point_lkup := 'none;
   e1 := var_val;
   goto check_op;
 
@@ -206,22 +206,25 @@ ret_int:
 
 ret_var:
   lookup_var := hd(tl(ret));
-  return_point := 'ret_var_found;
+  return_point_lkup := 'ret_var_found;
   goto lookup;
 
 ret_var_found:
-  return_point = 'none;
+  return_point_lkup = 'none;
   return var_val;
 
 ret_store:
   return store;
 
-find_return: if return_point = 'lookupe0_found goto lookupe0_found else goto fr0;
-fr0: if return_point = 'lookupe1_found goto lookupe1_found else goto fr1;
-fr1: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr2;
-fr2: if return_point = 'ret_var_found goto ret_var_found else goto fr3;
-fr3: if return_point = 'do_if_check goto do_if_check else goto fr4;
-fr4: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
+find_return: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr0;
+fr0: if return_point = 'do_if_check goto ret_var_found else goto fr1;
+fr1: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
+
+find_return_lkup: if return_point_lkup = 'lookupe0_found goto lookupe0_found else goto frup0;
+frup0: if return_point_lkup = 'lookupe1_found goto lookupe1_found else goto frup1;
+frup1: if return_point_lkup = 'ret_var_found goto ret_var_found else goto frup2;
+frup2: if return_point_lkup = 'none goto error_return_point_not_specified else goto error_return_point_missing_lookup;
+
 
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
@@ -241,7 +244,10 @@ error_var_not_found:
 error_return_point_missing:
   return list('error_return_point_not_found, return_point);
 
-error_return_point_not_specified
+error_return_point_missing_lookup:
+  return list('error_return_point_lkup_not_found, return_point_lkup);
+
+error_return_point_not_specified:
   return 'error_return_point_not_specified;
 
 error_return_type:
