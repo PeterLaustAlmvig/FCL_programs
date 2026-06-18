@@ -1,7 +1,6 @@
 Interpreter(prog, input_vars):
 init:
   store := '();
-  return_point := 'none;
   entry := hd(prog);
   next_block := entry;
   vars := hd(tl(prog));
@@ -52,12 +51,11 @@ eval_assignments_loop:
   assignment_list := tl(assignment_list);
   assgn_var := hd(curr_assign);
   expr := hd(tl(curr_assign));
-  return_point := 'eval_assignments_loop_store;
-  goto eval_expr;
+  exp := call eval_expr;
+  goto eval_assignments_loop_store;
 
 eval_assignments_loop_store:
-  return_point = 'none;
-  store := cons(list(assgn_var, ex), store);
+  store := cons(list(assgn_var, exp), store);
   goto eval_assignments_loop_check;
 
 eval_assignments_loop_check:
@@ -135,34 +133,34 @@ opcont9: if op = 'cons do_cons else goto error_op;
 
 do_pls:
   ex := e0 + e1;
-  goto find_return;
+  return ex;
 do_min:
   ex := e0 - e1;
-  goto find_return;
+  return ex;
 do_mul:
   ex := e0 * e1;
-  goto find_return;
+  return ex;
 do_eql:
   ex := e0 = e1;
-  goto find_return;
+  return ex;
 do_lt:
   ex := e0 < e1;
-  goto find_return;
+  return ex;
 do_gt:
   ex := e0 > e1;
-  goto find_return;
+  return ex;
 do_nul:
   ex := e0;
-  goto find_return;
+  return ex;
 do_hd:
   ex := hd(e0);
-  goto find_return;
+  return ex;
 do_tl:
   ex := tl(e0);
-  goto find_return;
+  return ex;
 do_cons:
   ex := cons(e0, e1);
-  goto find_return;
+  return ex;
 
 eval_jump:
   jump_type := hd(jump);
@@ -178,12 +176,11 @@ do_if:
   expr := hd(tl(jump));
   thenbr := hd(tl(tl(jump)));
   elsebr := hd(tl(tl(tl(jump))));
-  return_point := 'do_if_check;
-  goto eval_expr;
+  exp_ret := call eval_expr;
+  goto do_if_check;
 
 do_if_check:
-  return_point := 'none;
-  if ex = true goto do_if_then else goto do_if_else;
+  if exp_ret = true goto do_if_then else goto do_if_else;
 
 do_if_then:
   next_block := thenbr;
@@ -215,10 +212,6 @@ ret_var_found:
 
 ret_store:
   return store;
-
-find_return: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr0;
-fr0: if return_point = 'do_if_check goto do_if_check else goto fr1;
-fr1: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
 
 find_return_lkup: if return_point_lkup = 'lookupe0_found goto lookupe0_found else goto frup0;
 frup0: if return_point_lkup = 'lookupe1_found goto lookupe1_found else goto frup1;
