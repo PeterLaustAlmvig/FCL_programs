@@ -1,7 +1,6 @@
 Interpreter(prog, input_vars):
 init:
   store := '();
-  return_point := 'none;
   entry := hd(prog);
   next_block := entry;
   vars := hd(tl(prog));
@@ -52,12 +51,11 @@ eval_assignments_loop:
   assignment_list := tl(assignment_list);
   assgn_var := hd(curr_assign);
   expr := hd(tl(curr_assign));
-  return_point := 'eval_assignments_loop_store;
-  goto eval_expr;
+  exp := call eval_expr;
+  goto eval_assignments_loop_store;
 
 eval_assignments_loop_store:
-  return_point = 'none;
-  store := cons(list(assgn_var, ex), store);
+  store := cons(list(assgn_var, exp), store);
   goto eval_assignments_loop_check;
 
 eval_assignments_loop_check:
@@ -85,13 +83,13 @@ sete1:
 
 lookupe0:
   lookup_var := hd(tl(e0));
-  return_point_lkup := 'lookupe0_found;
-  goto lookup;
+  e0_var_val := call lookup;
+  goto lookupe0_found;
 
 lookupe1:
   lookup_var := hd(tl(e1));
-  return_point_lkup := 'lookupe1_found;
-  goto lookup;
+  e1_var_val := call lookup;
+  goto lookupe1_found;
 
 lookup:
   store_lookup := store;
@@ -109,16 +107,14 @@ lookup_loop_check:
 
 found_var:
   comment := 'val_stored_in_var_val;
-  goto find_return_lkup;
+  return var_val;
 
 lookupe0_found:
-  return_point_lkup := 'none;
-  e0 := var_val;
+  e0 := e0_var_val;
   goto check_e1_lbl;
 
 lookupe1_found:
-  return_point_lkup := 'none;
-  e1 := var_val;
+  e1 := e1_var_val;
   goto check_op;
 
 check_op:
@@ -135,34 +131,34 @@ opcont9: if op = 'cons do_cons else goto error_op;
 
 do_pls:
   ex := e0 + e1;
-  goto find_return;
+  return ex;
 do_min:
   ex := e0 - e1;
-  goto find_return;
+  return ex;
 do_mul:
   ex := e0 * e1;
-  goto find_return;
+  return ex;
 do_eql:
   ex := e0 = e1;
-  goto find_return;
+  return ex;
 do_lt:
   ex := e0 < e1;
-  goto find_return;
+  return ex;
 do_gt:
   ex := e0 > e1;
-  goto find_return;
+  return ex;
 do_nul:
   ex := e0;
-  goto find_return;
+  return ex;
 do_hd:
   ex := hd(e0);
-  goto find_return;
+  return ex;
 do_tl:
   ex := tl(e0);
-  goto find_return;
+  return ex;
 do_cons:
   ex := cons(e0, e1);
-  goto find_return;
+  return ex;
 
 eval_jump:
   jump_type := hd(jump);
@@ -178,12 +174,11 @@ do_if:
   expr := hd(tl(jump));
   thenbr := hd(tl(tl(jump)));
   elsebr := hd(tl(tl(tl(jump))));
-  return_point := 'do_if_check;
-  goto eval_expr;
+  exp_ret := call eval_expr;
+  goto do_if_check;
 
 do_if_check:
-  return_point := 'none;
-  if ex = true goto do_if_then else goto do_if_else;
+  if exp_ret = true goto do_if_then else goto do_if_else;
 
 do_if_then:
   next_block := thenbr;
@@ -206,25 +201,14 @@ ret_int:
 
 ret_var:
   lookup_var := hd(tl(ret));
-  return_point_lkup := 'ret_var_found;
-  goto lookup;
+  ret_var_val := call lookup;
+  goto ret_var_found;
 
 ret_var_found:
-  return_point_lkup := 'none;
-  return var_val;
+  return ret_var_val;
 
 ret_store:
   return store;
-
-find_return: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr0;
-fr0: if return_point = 'do_if_check goto do_if_check else goto fr1;
-fr1: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
-
-find_return_lkup: if return_point_lkup = 'lookupe0_found goto lookupe0_found else goto frup0;
-frup0: if return_point_lkup = 'lookupe1_found goto lookupe1_found else goto frup1;
-frup1: if return_point_lkup = 'ret_var_found goto ret_var_found else goto frup2;
-frup2: if return_point_lkup = 'none goto error_return_point_not_specified else goto error_return_point_missing_lookup;
-
 
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
@@ -240,15 +224,6 @@ error_op:
 
 error_var_not_found:
   return list('error_var_not_found_in_store, lookup_var);
-
-error_return_point_missing:
-  return list('error_return_point_not_found, return_point);
-
-error_return_point_missing_lookup:
-  return list('error_return_point_lkup_not_found, return_point_lkup);
-
-error_return_point_not_specified:
-  return 'error_return_point_not_specified;
 
 error_return_type:
   return list('error_return_type_not_known_not_return_of_expr_not_possible, type);
