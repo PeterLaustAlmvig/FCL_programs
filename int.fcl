@@ -210,14 +210,14 @@ ret_var:
   goto lookup;
 
 ret_var_found:
-  return_point_lkup = 'none;
+  return_point_lkup := 'none;
   return var_val;
 
 ret_store:
   return store;
 
 find_return: if return_point = 'eval_assignments_loop_store goto eval_assignments_loop_store else goto fr0;
-fr0: if return_point = 'do_if_check goto ret_var_found else goto fr1;
+fr0: if return_point = 'do_if_check goto do_if_check else goto fr1;
 fr1: if return_point = 'none goto error_return_point_not_specified else goto error_return_point_missing;
 
 find_return_lkup: if return_point_lkup = 'lookupe0_found goto lookupe0_found else goto frup0;
