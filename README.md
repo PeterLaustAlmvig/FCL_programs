@@ -1,6 +1,6 @@
 
 # FCL self-interpreter
-This repository contains an FCL-self interpreter. Since FCL only supports integers, lists (nested aswell) and qoute values ('value) the programs need to be encoded. The programs in ```test_programs/``` are programs following such encodings. This readme maybe updated in the future show the encoding is done.  
+This repository contains an FCL-self interpreter. Since FCL only supports integers, lists (nested aswell) and qoute values ('value) the programs need to be encoded in a special way. The programs in ```test_programs/``` are programs following such encodings. This readme maybe updated in the future show the encoding is done.  
 
 # Interpreter  
 The interpreter is implemented in int.fcl and expects two inputs.  
