@@ -83,13 +83,13 @@ sete1:
 
 lookupe0:
   lookup_var := hd(tl(e0));
-  return_point_lkup := 'lookupe0_found;
-  goto lookup;
+  e0_var_val := call lookup;
+  goto lookupe0_found;
 
 lookupe1:
   lookup_var := hd(tl(e1));
-  return_point_lkup := 'lookupe1_found;
-  goto lookup;
+  e1_var_val := call lookup;
+  goto lookupe1_found;
 
 lookup:
   store_lookup := store;
@@ -107,16 +107,14 @@ lookup_loop_check:
 
 found_var:
   comment := 'val_stored_in_var_val;
-  goto find_return_lkup;
+  return var_val;
 
 lookupe0_found:
-  return_point_lkup := 'none;
-  e0 := var_val;
+  e0 := e0_var_val;
   goto check_e1_lbl;
 
 lookupe1_found:
-  return_point_lkup := 'none;
-  e1 := var_val;
+  e1 := e1_var_val;
   goto check_op;
 
 check_op:
@@ -203,21 +201,14 @@ ret_int:
 
 ret_var:
   lookup_var := hd(tl(ret));
-  return_point_lkup := 'ret_var_found;
-  goto lookup;
+  ret_var_val := call lookup;
+  goto ret_var_found;
 
 ret_var_found:
-  return_point_lkup := 'none;
-  return var_val;
+  return ret_var_val;
 
 ret_store:
   return store;
-
-find_return_lkup: if return_point_lkup = 'lookupe0_found goto lookupe0_found else goto frup0;
-frup0: if return_point_lkup = 'lookupe1_found goto lookupe1_found else goto frup1;
-frup1: if return_point_lkup = 'ret_var_found goto ret_var_found else goto frup2;
-frup2: if return_point_lkup = 'none goto error_return_point_not_specified else goto error_return_point_missing_lookup;
-
 
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
@@ -233,15 +224,6 @@ error_op:
 
 error_var_not_found:
   return list('error_var_not_found_in_store, lookup_var);
-
-error_return_point_missing:
-  return list('error_return_point_not_found, return_point);
-
-error_return_point_missing_lookup:
-  return list('error_return_point_lkup_not_found, return_point_lkup);
-
-error_return_point_not_specified:
-  return 'error_return_point_not_specified;
 
 error_return_type:
   return list('error_return_type_not_known_not_return_of_expr_not_possible, type);
