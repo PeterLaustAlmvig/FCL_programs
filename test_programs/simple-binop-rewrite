@@ -1,8 +1,8 @@
-"list('lbl1 \
- list('l1) \
+"list('lbl1, \
+ list('l1), \
  list( \
- 	list('lbl1 list(\
- 		list('plus list('pls list('a 'l1) list('i 2))) \
- 		) \
- 		list('return list('i 1))))
+ 	list('lbl1, list(\
+ 		list('plus, list('pls, list('a, 'l1), list('i, 2))) \
+ 		), \
+ 		list('return, list('i, 1))))
  \)"

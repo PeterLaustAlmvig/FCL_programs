@@ -1,4 +1,36 @@
 Interpreter(prog, input_vars):
+init_stack_frame:
+  call_frame_stack := '();
+  next_block := '();
+  vars := '();
+  blocks := '();
+  blocks_lookup := '();
+  curr_block := '();
+  block_lbl := '();
+  assignments := '();
+  jump := '();
+  assignment_list := '();
+  curr_assign := '();
+  assgn_var := '();
+  expr := '();
+  op := '();
+  e0 := '();
+  e1 := '();
+  thenbr := '();
+  elsebr := '();
+  exp_ret := '();
+  lookup_var := '();
+  store_lookup := '();
+  curr_var := '();
+  var_lbl := '();
+  var_val := '();
+  e0_var_val := '();
+  e1_var_val := '();
+  ret := '();
+  type := '();
+  ret_value := '();
+  goto init:
+
 init:
   store := '();
   entry := hd(prog);
@@ -65,7 +97,14 @@ eval_expr:
   op := hd(expr);
   e0  := hd(tl(expr));
   e1 := hd(tl(tl(expr)));
-  goto check_e0_lbl;
+  goto eval_expr_precheck;
+
+eval_expr_precheck:
+  if op = 'call goto do_call else goto eep0;
+eep0: if op = 'nul goto do_nul else goto eep1;
+eep1: if op = 'hd goto do_hd else goto eep2;
+eep2: if op = 'tl goto do_tl else goto eep3;
+eep3: if op = 'cons goto do_cons else goto check_e0_lbl;
 
 check_e0_lbl:
   if hd(e0) = 'a goto lookupe0 else goto sete0;
@@ -123,11 +162,7 @@ opcont1: if op = 'min do_min else goto opcont2;
 opcont2: if op = 'mul do_mul else goto opcont3;
 opcont3: if op = 'eql do_eql else goto opcont4;
 opcont4: if op = 'lt do_lt else goto opcont5;
-opcont5: if op = 'gt do_gt else goto opcont6;
-opcont6: if op = 'nul do_nul else goto opcont7;
-opcont7: if op = 'hd do_hd else goto opcont8;
-opcont8: if op = 'tl do_tl else goto opcont9;
-opcont9: if op = 'cons do_cons else goto error_op;
+opcont5: if op = 'gt do_gt else goto error_op;
 
 do_pls:
   ex := e0 + e1;
@@ -146,9 +181,6 @@ do_lt:
   return ex;
 do_gt:
   ex := e0 > e1;
-  return ex;
-do_nul:
-  ex := e0;
   return ex;
 do_hd:
   ex := hd(e0);
@@ -196,19 +228,85 @@ dr0: if type = 'a goto ret_var else goto dr1;
 dr1: if type = 'store goto ret_store else goto error_return_type;
 
 ret_int:
-  int := hd(tl(ret));
-  return int;
+  ret_value := hd(tl(ret));
+  goto maybe_restore_call_frame;
 
 ret_var:
   lookup_var := hd(tl(ret));
-  ret_var_val := call lookup;
-  goto ret_var_found;
-
-ret_var_found:
-  return ret_var_val;
+  ret_value := call lookup;
+  goto maybe_restore_call_frame;
 
 ret_store:
-  return store;
+  ret_value := store;
+  goto maybe_restore_call_frame;
+
+maybe_restore_call_frame:
+  if call_frame_stack = '() goto ret_no_call else goto ret_with_call;
+
+ret_no_call:
+  return ret_value;
+
+do_call:
+  call_frame_stack := cons(list(store, next_block, blocks_lookup, curr_block, block_lbl, assignments, jump, assignment_list, curr_assign, assgn_var, expr, op, e0, e1, thenbr, elsebr, exp_ret, lookup_var, store_lookup, curr_var, var_lbl, var_val, e0_var_val, e1_var_val, ret, type), call_frame_stack);
+  next_block := hd(tl(e0));
+  blocks_lookup := hd(blocks);
+  goto eval_prog_loop;
+
+ret_with_call:
+  call_frame := hd(call_frame_stack);
+  call_frame_stack := tl(call_frame_stack);
+  store := hd(call_frame);
+  call_frame := tl(call_frame);
+  next_block := hd(call_frame);
+  call_frame := tl(call_frame);
+  blocks_lookup := hd(call_frame);
+  call_frame := tl(call_frame);
+  curr_block := hd(call_frame);
+  call_frame := tl(call_frame);
+  block_lbl := hd(call_frame);
+  call_frame := tl(call_frame);
+  assignments := hd(call_frame);
+  call_frame := tl(call_frame);
+  jump := hd(call_frame);
+  call_frame := tl(call_frame);
+  assignment_list := hd(call_frame);
+  call_frame := tl(call_frame);
+  curr_assign := hd(call_frame);
+  call_frame := tl(call_frame);
+  assgn_var := hd(call_frame);
+  call_frame := tl(call_frame);
+  expr := hd(call_frame);
+  call_frame := tl(call_frame);
+  op := hd(call_frame);
+  call_frame := tl(call_frame);
+  e0 := hd(call_frame);
+  call_frame := tl(call_frame);
+  e1 := hd(call_frame);
+  call_frame := tl(call_frame);
+  thenbr := hd(call_frame);
+  call_frame := tl(call_frame);
+  elsebr := hd(call_frame);
+  call_frame := tl(call_frame);
+  exp_ret := hd(call_frame);
+  call_frame := tl(call_frame);
+  lookup_var := hd(call_frame);
+  call_frame := tl(call_frame);
+  store_lookup := hd(call_frame);
+  call_frame := tl(call_frame);
+  curr_var := hd(call_frame);
+  call_frame := tl(call_frame);
+  var_lbl := hd(call_frame);
+  call_frame := tl(call_frame);
+  var_val := hd(call_frame);
+  call_frame := tl(call_frame);
+  e0_var_val := hd(call_frame);
+  call_frame := tl(call_frame);
+  e1_var_val := hd(call_frame);
+  call_frame := tl(call_frame);
+  ret := hd(call_frame);
+  call_frame := tl(call_frame);
+  type := hd(call_frame);
+  return ret_value;
 
 error_jump_type_not_supported:
   return list('error_jump_type_not_supported, jump_type);
