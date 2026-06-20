@@ -1,0 +1,25 @@
+"'('ack \
+ '('m 'n) \
+ '(\
+    '('ack \
+     '() \
+     '('if '('eql '('a m) '('i 0)) 'done 'next)) \
+    '('next \
+     '() \
+     '('if '('eql '('a n) '('i 0)) 'ack0 'ack1)) \
+    '('done \
+     '('('ret '('pls '('a n) '('i 1)))) \
+     '('return '('a 'ret) '() '())) \
+    '('ack0 \
+     '('('n '('pls '('i 1) '('i 0)))) \
+     '('goto 'ack2)) \
+    '('ack1 \
+     '('('n '('min '('a n) '('i 1))) \
+       '('n '('call '('c 'ack) '()))) \
+     '('goto 'ack2)) \
+    '('ack2 \
+     '('('m '('min '('a m) '('i 1))) \
+       '('n '('call '('c 'ack) '()))) \
+     '('return '('a 'n) '() '())) \
+ ))" \
+ "'(1 1)"
