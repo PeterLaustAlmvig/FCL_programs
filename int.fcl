@@ -101,10 +101,9 @@ eval_expr:
 
 eval_expr_precheck:
   if op = 'call goto do_call else goto eep0;
-eep0: if op = 'nul goto do_nul else goto eep1;
-eep1: if op = 'hd goto do_hd else goto eep2;
-eep2: if op = 'tl goto do_tl else goto eep3;
-eep3: if op = 'cons goto do_cons else goto check_e0_lbl;
+eep0: if op = 'hd goto do_hd else goto eep1;
+eep1: if op = 'tl goto do_tl else goto eep2;
+eep2: if op = 'cons goto do_cons else goto check_e0_lbl;
 
 check_e0_lbl:
   if hd(e0) = 'a goto lookupe0 else goto sete0;
